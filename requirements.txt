@@ -1,0 +1,9 @@
+# Core SWE-bench requirements
+swebench>=2.0.0
+datasets>=2.16.0
+docker>=7.0.0
+requests>=2.31.0
+tqdm>=4.66.0
+pandas>=2.0.0
+rich>=13.7.0
+python-dotenv>=1.0.0
