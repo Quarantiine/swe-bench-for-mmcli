@@ -43,10 +43,12 @@ fi
 
 # Step 3: Generate Agent Predictions using Minovative Mind CLI
 PREDICTIONS_FILE="predictions.jsonl"
+REPORT_FILE="evaluation_report.json"
 echo "[3/4] Ready to run prediction generation..."
-echo "To generate predictions using minovative-mind-cli, run:"
-echo "  minovative-mind-cli eval -i $INSTANCES_FILE -o $PREDICTIONS_FILE"
+echo "To generate predictions and export report metrics using minovative-mind-cli, run:"
+echo "  minovative-mind-cli eval -i $INSTANCES_FILE -o $PREDICTIONS_FILE -r $REPORT_FILE --autoClone"
 echo ""
+
 
 # Step 4: Run SWE-bench Evaluation Harness
 RUN_ID="eval_$(date +%Y%m%d_%H%M%S)"

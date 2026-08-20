@@ -57,13 +57,14 @@ docker info
 Run any evaluation workflow in 3 simple steps:
 
 ### 1. 🧪 Small Pilot Test (2 Instances)
+
 ```bash
 # Step 1: Clean old predictions & fetch 2 test instances
-rm -f predictions.jsonl
+rm -f predictions.jsonl evaluation_report.json
 python fetch_instances.py --limit 2 --format jsonl --output test_instances.jsonl
 
-# Step 2: Run Minovative Mind agent (generates predictions.jsonl)
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i test_instances.jsonl -o predictions.jsonl --autoClone
+# Step 2: Run Minovative Mind agent (generates predictions.jsonl & evaluation_report.json)
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i test_instances.jsonl -o predictions.jsonl -r evaluation_report.json --autoClone
 
 # Step 3: Run Docker evaluation harness
 ./run_eval.sh -a -p predictions.jsonl -r pilot_eval -w 2
@@ -77,33 +78,36 @@ cat minovative-mind-agent.pilot_eval.json
 ### 2. 🎯 Configurable Custom Tests
 
 #### A. Run on a Specific Repository (e.g., 5 `sympy` issues)
+
 ```bash
 # Fetch 5 sympy instances
 python fetch_instances.py --repo sympy/sympy --limit 5 --format jsonl --output sympy_instances.jsonl
 
 # Run agent
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i sympy_instances.jsonl -o predictions_sympy.jsonl --autoClone
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i sympy_instances.jsonl -o predictions_sympy.jsonl -r report_sympy.json --autoClone
 
 # Evaluate
 ./run_eval.sh -a -p predictions_sympy.jsonl -r eval_sympy -w 4
 ```
 
 #### B. Run on a Specific Instance ID (e.g., `astropy__astropy-12907`)
+
 ```bash
 # Run agent on single task
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i test_instances.jsonl --instanceId astropy__astropy-12907 -o predictions_single.jsonl --autoClone
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i test_instances.jsonl --instanceId astropy__astropy-12907 -o predictions_single.jsonl -r report_single.json --autoClone
 
 # Evaluate single task
 ./run_eval.sh -a -p predictions_single.jsonl -r eval_single -w 2
 ```
 
 #### C. Run a Custom Batch (e.g., 10 or 20 random tasks)
+
 ```bash
 # Fetch 10 tasks
 python fetch_instances.py --limit 10 --format jsonl --output instances_10.jsonl
 
 # Run agent with 2 parallel workers
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i instances_10.jsonl -o predictions_10.jsonl --autoClone --concurrency 2
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i instances_10.jsonl -o predictions_10.jsonl -r report_10.json --autoClone --concurrency 2
 
 # Evaluate in Docker with 4 workers
 ./run_eval.sh -a -p predictions_10.jsonl -r eval_10 -w 4
@@ -120,19 +124,19 @@ If you want to evaluate all 300 instances without consuming tens of gigabytes of
 ```bash
 # --- Batch 1: Astropy (6 instances) ---
 python fetch_instances.py --repo astropy/astropy --format jsonl --output b1_astropy.jsonl
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i b1_astropy.jsonl -o preds_astropy.jsonl --autoClone
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i b1_astropy.jsonl -o preds_astropy.jsonl -r report_astropy.json --autoClone
 ./run_eval.sh -a -p preds_astropy.jsonl -r report_astropy -w 4
 docker image prune -a  # Clean images (results are kept!)
 
 # --- Batch 2: SymPy (50 instances) ---
 python fetch_instances.py --repo sympy/sympy --format jsonl --output b2_sympy.jsonl
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i b2_sympy.jsonl -o preds_sympy.jsonl --autoClone -c 2
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i b2_sympy.jsonl -o preds_sympy.jsonl -r report_sympy.json --autoClone -c 2
 ./run_eval.sh -a -p preds_sympy.jsonl -r report_sympy -w 4
 docker image prune -a  # Clean images (results are kept!)
 
 # --- Batch 3: Django (115 instances) ---
 python fetch_instances.py --repo django/django --format jsonl --output b3_django.jsonl
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i b3_django.jsonl -o preds_django.jsonl --autoClone -c 2
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i b3_django.jsonl -o preds_django.jsonl -r report_django.json --autoClone -c 2
 ./run_eval.sh -a -p preds_django.jsonl -r report_django -w 4
 docker image prune -a  # Clean images (results are kept!)
 
@@ -149,7 +153,7 @@ python execute_benchmark.py report minovative-mind-agent.*.json -o full_benchmar
 python fetch_instances.py --format jsonl --output all_lite_instances.jsonl
 
 # Step 2: Run agent across all 300 instances (with 2 concurrent workers)
-node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i all_lite_instances.jsonl -o predictions_full.jsonl --autoClone --concurrency 2
+node "/Users/danielward/Developer/Work Projects/minovative-mind-cli/bin/run.js" eval -i all_lite_instances.jsonl -o predictions_full.jsonl -r evaluation_report.json --autoClone --concurrency 2
 
 # Step 3: Run full Docker evaluation harness (with 4 to 8 workers)
 ./run_eval.sh -a -p predictions_full.jsonl -r full_eval -w 4
@@ -244,10 +248,10 @@ python fetch_instances.py --dataset SWE-bench/SWE-bench_Verified --limit 20
 | :---------- | :-------------------------------------------------- | :------------------------- |
 | `--dataset` | Dataset repository name on Hugging Face             | `SWE-bench/SWE-bench_Lite` |
 | `--split`   | Dataset split (`test`, `dev`, `train`)              | `test`                     |
-| `--output`  | Destination output file path                        | `None` (stdout summary)        |
-| `--format`  | Export format (`json` or `jsonl`)                   | `json`                         |
-| `--limit`   | Maximum number of instances to retrieve             | All                            |
-| `--repo`    | Filter by repository name (e.g., `astropy/astropy`) | All                            |
+| `--output`  | Destination output file path                        | `None` (stdout summary)    |
+| `--format`  | Export format (`json` or `jsonl`)                   | `json`                     |
+| `--limit`   | Maximum number of instances to retrieve             | All                        |
+| `--repo`    | Filter by repository name (e.g., `astropy/astropy`) | All                        |
 
 ---
 
@@ -256,17 +260,17 @@ python fetch_instances.py --dataset SWE-bench/SWE-bench_Verified --limit 20
 The Minovative Mind CLI provides a built-in `eval` command runner powered by `SweBenchRunnerService` with automated Git workspace isolation and remote repository caching:
 
 ```bash
-# Evaluate instances and output predictions.jsonl (with automated repository auto-cloning)
-minovative-mind-cli eval --instances test_instances.jsonl --output predictions.jsonl --autoClone
+# Evaluate instances and output predictions.jsonl and evaluation_report.json
+minovative-mind-cli eval --instances test_instances.jsonl --output predictions.jsonl --report evaluation_report.json --autoClone
 
 # Run on a specific instance ID
-minovative-mind-cli eval -i test_instances.jsonl -o predictions.jsonl --instanceId astropy__astropy-12907 --autoClone
+minovative-mind-cli eval -i test_instances.jsonl -o predictions.jsonl -r report_single.json --instanceId astropy__astropy-12907 --autoClone
 
 # Dry run mode to verify workspace resolution and prompts without making LLM calls
 minovative-mind-cli eval -i test_instances.jsonl --dryRun
 
 # Specify custom concurrency and max turns
-minovative-mind-cli eval -i test_instances.jsonl -o predictions.jsonl -m minovative-mind-v1 --maxTurns 30 -c 2 --autoClone
+minovative-mind-cli eval -i test_instances.jsonl -o predictions.jsonl -r evaluation_report.json -m minovative-mind-v1 --maxTurns 30 -c 2 --autoClone
 ```
 
 ### CLI Evaluation Options
@@ -275,6 +279,7 @@ minovative-mind-cli eval -i test_instances.jsonl -o predictions.jsonl -m minovat
 | :------------------- | :------------------------------------------------------------------------- | :------------------ |
 | `-i, --instances`    | Path to input instances JSON or JSONL file                                 | _Required_          |
 | `-o, --output`       | Path to destination `predictions.jsonl` output                             | `predictions.jsonl` |
+| `-r, --report`       | Path to export comprehensive evaluation report JSON                        | `None` (Optional)   |
 | `--autoClone`        | Automatically clone repository if not found locally in workspace directory | `false`             |
 | `--instanceId`       | Filter by specific instance ID (e.g. `astropy__astropy-12907`)             | All instances       |
 | `--repo`             | Filter instances by repository name (e.g. `astropy/astropy`)               | All repos           |
