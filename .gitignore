@@ -23,3 +23,6 @@ minovative-mind-agent.*.json
 benchmark_summary.json
 *.eval.json
 .minovativemind/
+
+# Miscellaneous
+.minovativemind
