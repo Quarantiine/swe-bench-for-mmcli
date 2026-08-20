@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional
 
 
 def load_swebench_dataset(
-    dataset_name: str = "princeton-nlp/SWE-bench_Lite",
+    dataset_name: str = "SWE-bench/SWE-bench_Lite",
     split: str = "test",
     cache_dir: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
@@ -39,8 +39,15 @@ def load_swebench_dataset(
         )
         sys.exit(1)
 
-    print(f"Loading dataset '{dataset_name}' (split='{split}')...")
-    dataset = load_dataset(dataset_name, split=split, cache_dir=cache_dir)
+    dataset_map = {
+        "princeton-nlp/SWE-bench_Lite": "SWE-bench/SWE-bench_Lite",
+        "princeton-nlp/SWE-bench_Verified": "SWE-bench/SWE-bench_Verified",
+        "princeton-nlp/SWE-bench": "SWE-bench/SWE-bench",
+    }
+    target_dataset = dataset_map.get(dataset_name, dataset_name)
+
+    print(f"Loading dataset '{target_dataset}' (split='{split}')...")
+    dataset = load_dataset(target_dataset, split=split, cache_dir=cache_dir)
     return [dict(item) for item in dataset]
 
 

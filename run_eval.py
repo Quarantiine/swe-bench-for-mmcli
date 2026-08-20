@@ -105,36 +105,42 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "-d",
         "--dataset_name",
         type=str,
-        default="princeton-nlp/SWE-bench_Lite",
-        help="Dataset name or path (e.g. princeton-nlp/SWE-bench_Lite, princeton-nlp/SWE-bench, princeton-nlp/SWE-bench_Verified)",
+        default="SWE-bench/SWE-bench_Lite",
+        help="Dataset name or path (e.g. SWE-bench/SWE-bench_Lite, SWE-bench/SWE-bench, SWE-bench/SWE-bench_Verified)",
     )
     parser.add_argument(
+        "-s",
         "--split",
         type=str,
         default="test",
         help="Split of the dataset to evaluate",
     )
     parser.add_argument(
+        "-p",
         "--predictions_path",
         type=str,
         default="sample_predictions.jsonl",
         help="Path to JSONL predictions file, or 'gold' to evaluate ground truth reference patches",
     )
     parser.add_argument(
+        "-w",
         "--max_workers",
         type=int,
         default=get_default_workers(),
         help="Maximum parallel Docker test evaluation containers",
     )
     parser.add_argument(
+        "-r",
         "--run_id",
         type=str,
         default="",
         help="Unique evaluation run identifier (defaults to timestamp-based string)",
     )
     parser.add_argument(
+        "-i",
         "--instance_ids",
         type=str,
         nargs="*",
@@ -186,6 +192,15 @@ def run_swebench_eval(args: argparse.Namespace) -> int:
     if not check_docker_running():
         return 1
     print("  ✓ Docker daemon is active and responding.")
+
+    # Map legacy HuggingFace dataset names
+    dataset_map = {
+        "princeton-nlp/SWE-bench_Lite": "SWE-bench/SWE-bench_Lite",
+        "princeton-nlp/SWE-bench_Verified": "SWE-bench/SWE-bench_Verified",
+        "princeton-nlp/SWE-bench": "SWE-bench/SWE-bench",
+    }
+    if args.dataset_name in dataset_map:
+        args.dataset_name = dataset_map[args.dataset_name]
 
     # 2. Architecture & Platform Config
     is_arm = is_arm64_or_apple_silicon()
@@ -254,14 +269,9 @@ def run_swebench_eval(args: argparse.Namespace) -> int:
         str(args.max_workers),
         "--run_id",
         args.run_id,
-        "--cache_level",
-        args.cache_level,
         "--timeout",
         str(args.timeout),
     ]
-
-    if args.namespace is not None:
-        cmd.extend(["--namespace", args.namespace])
 
     if args.instance_ids:
         cmd.append("--instance_ids")
@@ -274,7 +284,8 @@ def run_swebench_eval(args: argparse.Namespace) -> int:
 
     env = os.environ.copy()
     if is_arm:
-        # Prevent docker buildx platform warnings
+        # Enable emulation and allow pulling x86_64 prebuilt SWE-bench images
+        env["DOCKER_DEFAULT_PLATFORM"] = "linux/amd64"
         env.setdefault("DOCKER_BUILDKIT", "1")
 
     try:

@@ -1,0 +1,25 @@
+# Virtual Environments & Dependencies
+venv/
+.venv/
+node_modules/
+
+# Python cache & macOS artifacts
+__pycache__/
+*.pyc
+.DS_Store
+
+# Evaluation logs & temporary patch files
+logs/
+*.log
+*.patch
+evaluation_results/
+
+# Run predictions & datasets (preserve reference sample template)
+*.jsonl
+!sample_predictions.jsonl
+
+# Evaluation Run Reports & Scorecards
+minovative-mind-agent.*.json
+benchmark_summary.json
+*.eval.json
+.minovativemind/

@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Defaults
-DATASET_NAME="princeton-nlp/SWE-bench_Lite"
+DATASET_NAME="SWE-bench/SWE-bench_Lite"
 PREDICTIONS_PATH="sample_predictions.jsonl"
 MAX_WORKERS=""
 RUN_ID=""
@@ -113,6 +113,11 @@ fi
 if ! docker info >/dev/null 2>&1; then
     echo "Error: Docker daemon is not running. Please start Docker and try again." >&2
     exit 1
+fi
+
+# Set default platform to linux/amd64 on Apple Silicon so Docker automatically pulls x86 images
+if [ "$(uname -m)" = "arm64" ] || [ "$FORCE_ARM64" = "true" ]; then
+    export DOCKER_DEFAULT_PLATFORM="linux/amd64"
 fi
 
 # Step 4: Assemble command line arguments
