@@ -26,3 +26,5 @@ benchmark_summary.json
 
 # Miscellaneous
 .minovativemind
+.tmp/
+scratch/
