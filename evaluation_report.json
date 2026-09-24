@@ -1,0 +1,145 @@
+{
+  "benchmark": "SWE-bench Lite",
+  "timestamp": "2026-09-24T13:00:02.818Z",
+  "environment": {
+    "platform": "Darwin (macOS) (Apple Silicon)",
+    "architecture": "arm64",
+    "nodeVersion": "v25.6.1",
+    "modelName": "minovative-mind-agent",
+    "timestamp": "2026-09-24T13:00:02.818Z"
+  },
+  "summary": {
+    "total_instances": 5,
+    "succeeded": 5,
+    "failed": 0,
+    "skipped": 0,
+    "success_rate_percent": 100,
+    "total_duration_seconds": 2066.8,
+    "average_duration_seconds": 413.4,
+    "total_diff_characters": 3080429,
+    "average_patch_characters": 616086
+  },
+  "recovery_metrics": {
+    "circuit_breaker_trips": 15,
+    "pruned_log_lines": 3935,
+    "pruned_log_characters": 355758
+  },
+  "token_economics": {
+    "total_tokens": 19533795,
+    "total_input_tokens": 19481383,
+    "total_output_tokens": 52412,
+    "total_cached_tokens": 16515073,
+    "cache_hit_rate_percent": 84.8
+  },
+  "repository_breakdown": {
+    "astropy/astropy": {
+      "total": 5,
+      "succeeded": 5,
+      "failed": 0,
+      "passRatePercent": 100,
+      "averageDurationMs": 413363
+    }
+  },
+  "instances": [
+    {
+      "instance_id": "astropy__astropy-12907",
+      "repo": "astropy/astropy",
+      "base_commit": "d16bfe05a744909de4b27f5875fe0d4ed41ce607",
+      "success": true,
+      "execution_time_seconds": 360.9,
+      "diff_size_characters": 538040,
+      "turn_count": 1,
+      "tokens": {
+        "input": 2082699,
+        "output": 6579,
+        "cached": 1681014,
+        "total": 2089278
+      },
+      "recovery_metrics": {
+        "circuit_breaker_trips": 2,
+        "pruned_log_lines": 335,
+        "pruned_log_characters": 23122
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-14182",
+      "repo": "astropy/astropy",
+      "base_commit": "a5917978be39d13cd90b517e1de4e7a539ffaa48",
+      "success": true,
+      "execution_time_seconds": 524.2,
+      "diff_size_characters": 725966,
+      "turn_count": 1,
+      "tokens": {
+        "input": 4954553,
+        "output": 8149,
+        "cached": 4233716,
+        "total": 4962702
+      },
+      "recovery_metrics": {
+        "circuit_breaker_trips": 4,
+        "pruned_log_lines": 2135,
+        "pruned_log_characters": 178022
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-14365",
+      "repo": "astropy/astropy",
+      "base_commit": "7269fa3e33e8d02485a647da91a5a2a60a06af61",
+      "success": true,
+      "execution_time_seconds": 276.4,
+      "diff_size_characters": 541178,
+      "turn_count": 1,
+      "tokens": {
+        "input": 2224856,
+        "output": 5526,
+        "cached": 1815050,
+        "total": 2230382
+      },
+      "recovery_metrics": {
+        "circuit_breaker_trips": 1,
+        "pruned_log_lines": 0,
+        "pruned_log_characters": 0
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-14995",
+      "repo": "astropy/astropy",
+      "base_commit": "b16c7d12ccbc7b2d20364b89fb44285bcbfede54",
+      "success": true,
+      "execution_time_seconds": 354.4,
+      "diff_size_characters": 669836,
+      "turn_count": 1,
+      "tokens": {
+        "input": 3626270,
+        "output": 8988,
+        "cached": 3052065,
+        "total": 3635258
+      },
+      "recovery_metrics": {
+        "circuit_breaker_trips": 3,
+        "pruned_log_lines": 1411,
+        "pruned_log_characters": 149880
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-6938",
+      "repo": "astropy/astropy",
+      "base_commit": "c76af9ed6bb89bfba45b9f5bc1e635188278e2fa",
+      "success": true,
+      "execution_time_seconds": 551,
+      "diff_size_characters": 605409,
+      "turn_count": 1,
+      "tokens": {
+        "input": 6593005,
+        "output": 23170,
+        "cached": 5733228,
+        "total": 6616175
+      },
+      "recovery_metrics": {
+        "circuit_breaker_trips": 5,
+        "pruned_log_lines": 54,
+        "pruned_log_characters": 4734
+      }
+    }
+  ]
+}
