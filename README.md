@@ -62,6 +62,9 @@ Run any evaluation workflow in 3 simple steps:
 Run the complete 5-stage evaluation lifecycle with a single command (auto-detects/sets up venv, fetches instances, generates agent predictions, runs Docker evaluation, and generates post-eval scorecard with failure diagnosis):
 
 ```bash
+# Ensure scripts are executable (one-time setup)
+chmod +x *.sh
+
 # Run a quick 2-instance pilot test
 ./run_pipeline.sh --limit 2
 
@@ -425,57 +428,59 @@ python run_eval.py \
 
 ### 📖 CLI Options & Parameter Reference
 
-| Flag / Option | Long Flag | Description | Default |
-| :--- | :--- | :--- | :--- |
-| **Filtering & Limits** | | | |
-| `-l` | `--limit <NUM>` | Maximum number of benchmark instances to evaluate (e.g. `2`, `5`, `10`) | All instances |
-| `-r` | `--repo <REPO>` | Filter instances by repository name (e.g. `sympy/sympy`, `django/django`, `astropy/astropy`) | All repos |
-| `-i` | `--instance-id <ID>` | Filter by specific instance ID (e.g. `sympy__sympy-20590`) | None |
-| `-d` | `--dataset <NAME>` | Hugging Face dataset identifier (`SWE-bench/SWE-bench_Lite`, `SWE-bench/SWE-bench_Verified`, `SWE-bench/SWE-bench`) | `SWE-bench/SWE-bench_Lite` |
-| `-s` | `--split <SPLIT>` | Dataset split to evaluate (`test`, `dev`, `train`) | `test` |
-| **Performance & Execution** | | | |
-| `-w` | `--workers <NUM>` | Maximum parallel Docker evaluation workers | `2` |
-| `-m` | `--max-turns <NUM>` | Maximum agent execution turns per benchmark instance | `30` |
-| `-t` | `--timeout <SEC>` | Timeout per instance test run in seconds | `1800` (30m) |
-| `-c` | `--concurrency <NUM>` | Number of benchmark instances for the agent to evaluate concurrently | `1` |
-| `-a` | `--arm64` | Force ARM64 / Apple Silicon local container build settings | Auto-detected |
-| **File Paths & Metadata** | | | |
-| `-f` | `--instances <PATH>` | Path to instances JSONL file | `test_instances.jsonl` |
-| `-p` | `--predictions <PATH>` | Destination path for output `predictions.jsonl` file | `predictions.jsonl` |
-| | `--report <PATH>` | Path to export agent execution report JSON | `evaluation_report.json` |
-| | `--run-id <ID>` | Custom run identifier for logs and scorecard files | Auto-generated timestamp |
-| | `--model <NAME>` | Model identifier tag for prediction metadata | `minovative-mind-agent` |
-| | `--cache <LEVEL>` | Docker harness cache level (`none`, `base`, `env`, `instance`) | `env` |
-| **Pipeline Stage Controls** | | | |
-| | `--skip-fetch` | Skip instance fetching stage (re-use existing instances file) | `false` |
-| | `--skip-agent` | Skip agent prediction generation (evaluate existing predictions file) | `false` |
-| | `--skip-eval` | Skip Docker evaluation harness stage (only fetch & generate patches) | `false` |
-| | `--skip-post-eval` | Skip post-benchmark scorecard analysis & cleanup step | `false` |
-| | `--post-eval` | Explicitly enable post-evaluation analysis stage | `true` |
-| | `--force-fetch` | Force re-fetching instances from Hugging Face even if file exists | `false` |
-| | `--dry-run` | Dry run mode for agent predictions (validates setup without LLM calls) | `false` |
-| | `--no-auto-clone` | Disable automatic Git repository cloning during agent run | `false` |
-| `-g` | `--gold` | Evaluate ground-truth gold reference patches directly (sanity check) | `false` |
-| `-v` | `--verbose` | Enable verbose debug logging throughout execution | `false` |
-| **Post-Eval Hooks & Resource Cleanup** | | | |
-| `-u` | `--export-unresolved <PATH>` | Export unresolved/failed instance IDs to text file (one ID per line) | None |
-| `-j` | `--export-jsonl <PATH>` | Export unresolved instances as filtered JSONL for immediate re-runs | None |
-| | `--post-eval-report <PATH>` | Save consolidated post-eval scorecard to JSON file | None |
-| | `--max-failures <NUM>` | Maximum number of failure logs to display in terminal | `5` |
-| | `--no-logs` | Skip failure log extraction in post-eval summary | `false` |
-| | `--clean-docker` | Remove stopped test containers & SWE-bench Docker images after eval | `false` |
-| | `--clean-cache` | Clear SWE-bench git repository cache (`~/.cache/swe-bench-repos`) | `false` |
-| | `--clean-all, --prune` | Complete cleanup of Docker images, containers & git repo cache | `false` |
-| `-h` | `--help` | Display CLI help menu and option summary | — |
-| `-v` | `--verbose` | Enable verbose debug logging throughout execution | `false` |
-| `-h` | `--help` | Display CLI help menu and option summary | — |
+| Flag / Option                          | Long Flag                    | Description                                                                                                         | Default                    |
+| :------------------------------------- | :--------------------------- | :------------------------------------------------------------------------------------------------------------------ | :------------------------- |
+| **Filtering & Limits**                 |                              |                                                                                                                     |                            |
+| `-l`                                   | `--limit <NUM>`              | Maximum number of benchmark instances to evaluate (e.g. `2`, `5`, `10`)                                             | All instances              |
+| `-r`                                   | `--repo <REPO>`              | Filter instances by repository name (e.g. `sympy/sympy`, `django/django`, `astropy/astropy`)                        | All repos                  |
+| `-i`                                   | `--instance-id <ID>`         | Filter by specific instance ID (e.g. `sympy__sympy-20590`)                                                          | None                       |
+| `-d`                                   | `--dataset <NAME>`           | Hugging Face dataset identifier (`SWE-bench/SWE-bench_Lite`, `SWE-bench/SWE-bench_Verified`, `SWE-bench/SWE-bench`) | `SWE-bench/SWE-bench_Lite` |
+| `-s`                                   | `--split <SPLIT>`            | Dataset split to evaluate (`test`, `dev`, `train`)                                                                  | `test`                     |
+| **Performance & Execution**            |                              |                                                                                                                     |                            |
+| `-w`                                   | `--workers <NUM>`            | Maximum parallel Docker evaluation workers                                                                          | `2`                        |
+| `-m`                                   | `--max-turns <NUM>`          | Maximum agent execution turns per benchmark instance                                                                | `30`                       |
+| `-t`                                   | `--timeout <SEC>`            | Timeout per instance test run in seconds                                                                            | `1800` (30m)               |
+| `-c`                                   | `--concurrency <NUM>`        | Number of benchmark instances for the agent to evaluate concurrently                                                | `1`                        |
+| `-a`                                   | `--arm64`                    | Force ARM64 / Apple Silicon local container build settings                                                          | Auto-detected              |
+| **File Paths & Metadata**              |                              |                                                                                                                     |                            |
+| `-f`                                   | `--instances <PATH>`         | Path to instances JSONL file                                                                                        | `test_instances.jsonl`     |
+| `-p`                                   | `--predictions <PATH>`       | Destination path for output `predictions.jsonl` file                                                                | `predictions.jsonl`        |
+|                                        | `--report <PATH>`            | Path to export agent execution report JSON                                                                          | `evaluation_report.json`   |
+|                                        | `--run-id <ID>`              | Custom run identifier for logs and scorecard files                                                                  | Auto-generated timestamp   |
+|                                        | `--model <NAME>`             | Model identifier tag for prediction metadata                                                                        | `minovative-mind-agent`    |
+|                                        | `--cache <LEVEL>`            | Docker harness cache level (`none`, `base`, `env`, `instance`)                                                      | `env`                      |
+| **Pipeline Stage Controls**            |                              |                                                                                                                     |                            |
+|                                        | `--skip-fetch`               | Skip instance fetching stage (re-use existing instances file)                                                       | `false`                    |
+|                                        | `--skip-agent`               | Skip agent prediction generation (evaluate existing predictions file)                                               | `false`                    |
+|                                        | `--skip-eval`                | Skip Docker evaluation harness stage (only fetch & generate patches)                                                | `false`                    |
+|                                        | `--skip-post-eval`           | Skip post-benchmark scorecard analysis & cleanup step                                                               | `false`                    |
+|                                        | `--post-eval`                | Explicitly enable post-evaluation analysis stage                                                                    | `true`                     |
+|                                        | `--force-fetch`              | Force re-fetching instances from Hugging Face even if file exists                                                   | `false`                    |
+|                                        | `--dry-run`                  | Dry run mode for agent predictions (validates setup without LLM calls)                                              | `false`                    |
+|                                        | `--no-auto-clone`            | Disable automatic Git repository cloning during agent run                                                           | `false`                    |
+| `-g`                                   | `--gold`                     | Evaluate ground-truth gold reference patches directly (sanity check)                                                | `false`                    |
+| `-v`                                   | `--verbose`                  | Enable verbose debug logging throughout execution                                                                   | `false`                    |
+| **Post-Eval Hooks & Resource Cleanup** |                              |                                                                                                                     |                            |
+| `-u`                                   | `--export-unresolved <PATH>` | Export unresolved/failed instance IDs to text file (one ID per line)                                                | None                       |
+| `-j`                                   | `--export-jsonl <PATH>`      | Export unresolved instances as filtered JSONL for immediate re-runs                                                 | None                       |
+|                                        | `--post-eval-report <PATH>`  | Save consolidated post-eval scorecard to JSON file                                                                  | None                       |
+|                                        | `--max-failures <NUM>`       | Maximum number of failure logs to display in terminal                                                               | `5`                        |
+|                                        | `--no-logs`                  | Skip failure log extraction in post-eval summary                                                                    | `false`                    |
+|                                        | `--clean-docker`             | Remove stopped test containers & SWE-bench Docker images after eval                                                 | `false`                    |
+|                                        | `--clean-cache`              | Clear SWE-bench git repository cache (`~/.cache/swe-bench-repos`)                                                   | `false`                    |
+|                                        | `--clean-all, --prune`       | Complete cleanup of Docker images, containers & git repo cache                                                      | `false`                    |
+| `-h`                                   | `--help`                     | Display CLI help menu and option summary                                                                            | —                          |
+| `-v`                                   | `--verbose`                  | Enable verbose debug logging throughout execution                                                                   | `false`                    |
+| `-h`                                   | `--help`                     | Display CLI help menu and option summary                                                                            | —                          |
 
 ---
 
 ### 💡 Comprehensive Pipeline Usage Examples
 
 #### 1. Quick Pilot Run with Configurable Limits
+
 Run a rapid smoke test with 2 or 5 instances to verify end-to-end functionality:
+
 ```bash
 # Evaluate 2 instances end-to-end
 ./run_pipeline.sh --limit 2
@@ -485,7 +490,9 @@ Run a rapid smoke test with 2 or 5 instances to verify end-to-end functionality:
 ```
 
 #### 2. Filter by Repository with Limits
+
 Target specific repositories (e.g. `sympy`, `django`, `pytest`, `astropy`) with constrained limits:
+
 ```bash
 # Run 5 SymPy issues with 4 parallel Docker test workers
 ./run_pipeline.sh --repo sympy/sympy --limit 5 --workers 4
@@ -498,13 +505,17 @@ Target specific repositories (e.g. `sympy`, `django`, `pytest`, `astropy`) with 
 ```
 
 #### 3. Single Instance End-to-End Debugging
+
 Pinpoint a single benchmark instance from fetch to agent fix and Docker validation:
+
 ```bash
 ./run_pipeline.sh --instance-id sympy__sympy-20590
 ```
 
 #### 4. Evaluating SWE-bench Verified or Full
+
 Switch datasets easily while controlling limits and timeouts:
+
 ```bash
 # Run on 10 instances of SWE-bench Verified
 ./run_pipeline.sh --dataset SWE-bench/SWE-bench_Verified --limit 10 --max-turns 40 --workers 4
@@ -514,7 +525,9 @@ Switch datasets easily while controlling limits and timeouts:
 ```
 
 #### 5. Selective Pipeline Stages (Skipping & Fast Iteration)
+
 Mix and match stages to save time during agent development:
+
 ```bash
 # Case A: Only fetch instances and generate agent predictions (skip Docker evaluation)
 ./run_pipeline.sh --limit 5 --skip-eval
@@ -527,19 +540,25 @@ Mix and match stages to save time during agent development:
 ```
 
 #### 6. Sanity Checking with Ground-Truth Gold Patches
+
 Evaluate reference dataset patches directly to verify test harness correctness:
+
 ```bash
 ./run_pipeline.sh --gold --repo sympy/sympy --limit 3 --workers 2
 ```
 
 #### 7. High-Throughput Parallel Evaluation
+
 Leverage agent concurrency and multiple Docker workers for fast large-scale runs:
+
 ```bash
 ./run_pipeline.sh --limit 25 --concurrency 2 --workers 8 --timeout 1200
 ```
 
 #### 8. Integrated Post-Evaluation & Storage Pruning
+
 Run the end-to-end evaluation pipeline with automatic post-evaluation failure export and Docker container/image cleanup:
+
 ```bash
 # Run 5 instances, export unresolved tasks to JSONL, and clean Docker images
 ./run_pipeline.sh --limit 5 --export-jsonl failed_tasks.jsonl --clean-docker
@@ -580,30 +599,30 @@ Once evaluations complete, the **Post-Benchmark Analysis & Cleanup Runner** (`po
 
 Both `./post_eval.sh` (convenience bash wrapper) and `python post_eval.py` support the full set of diagnostic and cleanup options:
 
-| Flag / Option | Long Flag | Description | Default |
-| :--- | :--- | :--- | :--- |
-| **Reports & Run Identification** | | | |
-| `-r` | `--run-id <ID>` | Evaluation run identifier to locate results and logs | Auto-detected |
-| `-e` | `--report <PATH...>` | Path(s) or glob pattern to evaluation JSON result files (e.g. `*.eval.json`) | Auto-detected |
-| | `--agent-report <PATH>` | Path to agent prediction generation report JSON | `evaluation_report.json` |
-| **Diagnostics & Log Filtering** | | | |
-| | `--max-failures <NUM>` | Maximum number of failure log excerpts to display in terminal | `5` |
-| | `--no-logs` | Skip searching and extracting diagnostic test failure log snippets | `false` |
-| **Export & Targeted Re-runs** | | | |
-| `-u` | `--export-unresolved <PATH>` | Export unresolved/failed instance IDs to a text file (one ID per line) | None |
-| `-j` | `--export-jsonl <PATH>` | Export unresolved instances as a filtered JSONL dataset for re-running | None |
-| `-s` | `--instances-source <PATH>` | Source instances JSONL file to filter for `--export-jsonl` | `test_instances.jsonl` |
-| `-o` | `--output-summary <PATH>` | Save consolidated post-eval scorecard to JSON file | None |
-| | `--json` | Output raw consolidated scorecard JSON to stdout | `false` |
-| **Disk Storage & Cache Cleanup** | | | |
-| | `--clean-docker` | Remove stopped test containers and local SWE-bench Docker images | `false` |
-| | `--clean-docker-containers` | Remove only stopped SWE-bench evaluation containers | `false` |
-| | `--clean-docker-images` | Remove only SWE-bench Docker container images and build layers | `false` |
-| | `--clean-cache` | Clear SWE-bench git repository cache (`~/.cache/swe-bench-repos`) | `false` |
-| | `--cache-dir <PATH>` | Custom repository cache directory path | `~/.cache/swe-bench-repos` |
-| | `--clean-all, --prune` | Complete cleanup (containers, images, builder cache, and repo cache) | `false` |
-| | `--dry-run` | Simulate cleanup operations without deleting any files or containers | `false` |
-| `-h` | `--help` | Display CLI help menu and option summary | — |
+| Flag / Option                    | Long Flag                    | Description                                                                  | Default                    |
+| :------------------------------- | :--------------------------- | :--------------------------------------------------------------------------- | :------------------------- |
+| **Reports & Run Identification** |                              |                                                                              |                            |
+| `-r`                             | `--run-id <ID>`              | Evaluation run identifier to locate results and logs                         | Auto-detected              |
+| `-e`                             | `--report <PATH...>`         | Path(s) or glob pattern to evaluation JSON result files (e.g. `*.eval.json`) | Auto-detected              |
+|                                  | `--agent-report <PATH>`      | Path to agent prediction generation report JSON                              | `evaluation_report.json`   |
+| **Diagnostics & Log Filtering**  |                              |                                                                              |                            |
+|                                  | `--max-failures <NUM>`       | Maximum number of failure log excerpts to display in terminal                | `5`                        |
+|                                  | `--no-logs`                  | Skip searching and extracting diagnostic test failure log snippets           | `false`                    |
+| **Export & Targeted Re-runs**    |                              |                                                                              |                            |
+| `-u`                             | `--export-unresolved <PATH>` | Export unresolved/failed instance IDs to a text file (one ID per line)       | None                       |
+| `-j`                             | `--export-jsonl <PATH>`      | Export unresolved instances as a filtered JSONL dataset for re-running       | None                       |
+| `-s`                             | `--instances-source <PATH>`  | Source instances JSONL file to filter for `--export-jsonl`                   | `test_instances.jsonl`     |
+| `-o`                             | `--output-summary <PATH>`    | Save consolidated post-eval scorecard to JSON file                           | None                       |
+|                                  | `--json`                     | Output raw consolidated scorecard JSON to stdout                             | `false`                    |
+| **Disk Storage & Cache Cleanup** |                              |                                                                              |                            |
+|                                  | `--clean-docker`             | Remove stopped test containers and local SWE-bench Docker images             | `false`                    |
+|                                  | `--clean-docker-containers`  | Remove only stopped SWE-bench evaluation containers                          | `false`                    |
+|                                  | `--clean-docker-images`      | Remove only SWE-bench Docker container images and build layers               | `false`                    |
+|                                  | `--clean-cache`              | Clear SWE-bench git repository cache (`~/.cache/swe-bench-repos`)            | `false`                    |
+|                                  | `--cache-dir <PATH>`         | Custom repository cache directory path                                       | `~/.cache/swe-bench-repos` |
+|                                  | `--clean-all, --prune`       | Complete cleanup (containers, images, builder cache, and repo cache)         | `false`                    |
+|                                  | `--dry-run`                  | Simulate cleanup operations without deleting any files or containers         | `false`                    |
+| `-h`                             | `--help`                     | Display CLI help menu and option summary                                     | —                          |
 
 ---
 
@@ -662,19 +681,25 @@ When executed, `post_eval` renders a terminal scorecard:
 ### 💡 Workflow Examples & Common Recipes
 
 #### 1. Instant Post-Run Scorecard & Diagnostics
+
 Analyze the most recent benchmark run in the workspace:
+
 ```bash
 ./post_eval.sh
 ```
 
 #### 2. Analyze Specific Run by ID
+
 Inspect logs and test results for a specific evaluation tag:
+
 ```bash
 ./post_eval.sh --run-id pilot_eval
 ```
 
 #### 3. Export Unresolved Tasks to JSONL & Iterate
+
 Quickly extract only the instances that failed, and immediately pass them into another pipeline run:
+
 ```bash
 # Step 1: Export failing instances to filtered JSONL
 ./post_eval.sh --export-jsonl failed_tasks.jsonl --instances-source test_instances.jsonl
@@ -684,7 +709,9 @@ Quickly extract only the instances that failed, and immediately pass them into a
 ```
 
 #### 4. Export Failed Task IDs to Plain Text
+
 Generate a simple text list of failed IDs for scripting or batch processing:
+
 ```bash
 ./post_eval.sh -u failed_instance_ids.txt
 
@@ -693,7 +720,9 @@ Generate a simple text list of failed IDs for scripting or batch processing:
 ```
 
 #### 5. Post-Benchmark Storage Recovery (Zero Bloat)
+
 Clean up Docker images, stopped test containers, and git repository caches after completing evaluations:
+
 ```bash
 # Dry run to preview what would be deleted
 ./post_eval.sh --clean-all --dry-run
@@ -703,6 +732,7 @@ Clean up Docker images, stopped test containers, and git repository caches after
 ```
 
 #### 6. Export Structured JSON Scorecard for CI/CD Integration
+
 ```bash
 # Save JSON scorecard summary to file
 ./post_eval.sh -o evaluation_summary.json
@@ -712,6 +742,7 @@ Clean up Docker images, stopped test containers, and git repository caches after
 ```
 
 #### 7. Using Python Directly (`post_eval.py`)
+
 ```bash
 python post_eval.py --report evaluation_results/*.json --agent-report evaluation_report.json -u unresolved.txt
 ```

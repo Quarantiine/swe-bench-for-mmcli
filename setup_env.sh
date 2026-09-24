@@ -53,6 +53,8 @@ else
     echo "Warning: requirements.txt not found in ${SCRIPT_DIR}."
 fi
 
+chmod +x "${SCRIPT_DIR}"/*.sh
+
 echo "========================================================"
 echo " Setup completed successfully!"
 echo " Activate the environment with: source venv/bin/activate"
