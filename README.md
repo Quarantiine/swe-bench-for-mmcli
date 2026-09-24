@@ -73,8 +73,8 @@ Your API key is securely encrypted on your local machine. Once configured, all S
 Clone this repository and run the automated environment setup script:
 
 ```bash
-git clone https://github.com/quarantiine/swe-bench-test.git
-cd swe-bench-test
+git clone https://github.com/Quarantiine/swe-bench-for-mmcli.git
+cd swe-bench-for-mmcli
 
 # Initialize Python virtualenv and install dependencies:
 ./setup_env.sh
