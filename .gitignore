@@ -28,3 +28,4 @@ benchmark_summary.json
 .minovativemind
 .tmp/
 scratch/
+.playwright-mcp/
